@@ -1,0 +1,18 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/.log": true,
+    "**/avalon.js": true,
+    "**/v-ie.js": true,
+    "**/v.dev-ie.js": true,
+    "**/v.dev.js": true,
+    "**/v.js": true,
+    "**/.history": true,
+    "**/.vscode": true
+  },
+  "explorerExclude.backup": null
+}
