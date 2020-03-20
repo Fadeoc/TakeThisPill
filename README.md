@@ -9,3 +9,4 @@ Google, Bing, Baidu, Yandex
 + better performance, get rid of setinterval
 + better code, all es6
 + better code style, stop copying :), if I have time.
++ sure better UI
