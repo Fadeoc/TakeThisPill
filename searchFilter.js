@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name        Google Search URL Filter
-// @namespace   http://0-oo.net/
+// @namespace   https://fadeoc.github.io
 // @description The search results filter/blocker for Google Search
 // @homepage    https://github.com/Fadeoc/TakeThisPill/blob/master/searchFilter.js
-// @homepage    http://0-oo.net/log/category/greasemonkey/google-instant-url-filter/
+// baseon       http://0-oo.net/log/category/greasemonkey/google-instant-url-filter/
 // @version     0.4.1
+// @license     MIT
 // @include     http*://www.google.tld/search*
 // @include     http*://www.google.tld/webhp*
 // @include     http*://www.google.tld/#*
@@ -17,9 +18,6 @@
 // @grant GM_getValue
 // @grant GM_setValue
 // ==/UserScript==
-//
-// ( The MIT License )
-//
 
 (function () {
 	var SCRIPT_NAME = "Search URL Filter"
@@ -86,7 +84,7 @@
 	console.log("urls" + urls)
 
 	if (!urls) {
-		return;
+		return
 	}
 
 	urls = urls.replace(/([.?])/g, "\\$1").replace(/\*/g, ".*").replace(/\n/g, "|")
