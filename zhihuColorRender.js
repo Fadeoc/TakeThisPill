@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         zhihuColorRender
 // @namespace    http://io.github.fadeoc/
-// @version      0.1
+// @version      0.2
 // @description  color, color, how cute!~
 // @author       unwilling to leave name Mr. Fadeoc
 // @match        http*://www.zhihu.com/*
@@ -13,6 +13,7 @@
  * @method mordenHappyProgrammerAlias
  * @description just a shell, lol
  * @since 0.1
+ * @version 0.2
  */
 (function () {
   //dear sir, you could custom color here
@@ -20,8 +21,8 @@
     default: '#e8c15f',
     answer: '',
     ads: 'grey',
-    article: '',
-    post: '',
+    article: '#e8c15f',
+    post: '#e8c15f',
     relevant: 'green'
   }
   //and this is check interval, by seconds, change this value could tune the speed of checking, thus save your browser performance
@@ -37,13 +38,16 @@
 * @method mordenHappyProgrammerAlias
 * @description just a shell, lol
 * @since 0.1
+* @version 0.2
 * @todo scrolling detecting against setTimeout
 */
 function workwork() {
   //get all feed items collection
   let items = document.getElementsByClassName('TopstoryItem')
   //maybe user is on search-result page?
-  items = document.getElementsByClassName('SearchResult-Card')
+  if (isVoid(items)) {
+    items = document.getElementsByClassName('SearchResult-Card')
+  }
   //consume each item
   Array.prototype.forEach.call(items, item => consumer(item))
 
@@ -56,6 +60,7 @@ function workwork() {
 * @description set color via item self-defined data attrs
 * @param {HTML Element} item
 * @since 0.1
+* @version 0.2
 */
 function consumer(item) {
 
@@ -85,18 +90,20 @@ function consumer(item) {
 * @method consumeSearchContainer
 * @description consume search-result block
 * @param {HTML Element} item
-* @since 0.1
+* @since 0.2
+* @version 0.2
 */
 function consumeSearchContainer(item) {
   const relevantBlocks = item.getElementsByClassName('RelevantQuery')
   if (!isVoid(relevantBlocks)) {
     setColorMain(item, 'relavent')
   }
-  else {
+  else if (!isVoid(item.getAttribute('data-za-extra-module'))) {
     const data = item.getAttribute('data-za-extra-module')
     const json = JSON.parse(data)
     contentType = json.card.content.type
-    setColorMain(item, contentType)
+    setColorMain(item, contentType.toLowerCase())
+    setColorActionbar(item, contentType.toLowerCase())
   }
 }
 
@@ -134,8 +141,8 @@ function consumeNormalContainer(item, normalContainer) {
   }
 
   if (unsafeWindow.colorMap.hasOwnProperty(contentType.toLowerCase())) {
-    setColorMain(item, contentType)
-    setColorActionbar(item, contentType)
+    setColorMain(item, contentType.toLowerCase())
+    setColorActionbar(item, contentType.toLowerCase())
   }
   else {
     setColorMain(item, 'default')
