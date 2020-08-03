@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         zhihuColorRender
+// @name         zhihuColorRenderPro
 // @namespace    http://io.github.fadeoc/
-// @version      0.3
-// @description  color, color, how cute!~
+// @version      0.4
+// @description  really? pro?
 // @author       unwilling to leave name Mr. Fadeoc
 // @match        http*://www.zhihu.com/*
 // @include      http*://www.zhihu.com/*
@@ -13,7 +13,7 @@
  * @method mordenHappyProgrammerAlias
  * @description just a shell, lol
  * @since 0.1
- * @version 0.3
+ * @version 0.4
  */
 (function () {
   //dear sir, you could custom color here
@@ -24,7 +24,9 @@
     article: '#e8c15f',
     post: '#e8c15f',
     zvideo: '#af739a',
-    relevant: 'green'
+    relevant: 'green',
+    btn: 'green',
+    btntext: '#f8f8f8',
   }
   //accessbility
   unsafeWindow.descMap = {
@@ -36,12 +38,19 @@
     zvideo: '这是一部视频',
     relevant: '这是您搜索结果的相关内容推荐链接区域'
   }
+  unsafeWindow.proMap = {
+    colorRender: true,
+    imageRender: true,
+    accessability: false
+    
+  }
   //and this is check interval, by seconds, change this value could tune the speed of checking, thus save your browser performance
   unsafeWindow.timefrag = 1
 
   //orcs, go to work!
   console.log('more work?')
   workwork()
+
 })()
 
 
@@ -49,7 +58,7 @@
 * @method mordenHappyProgrammerAlias
 * @description just a shell, lol
 * @since 0.1
-* @version 0.2
+* @version 0.4
 * @todo scrolling detecting against setTimeout
 */
 function workwork() {
@@ -58,6 +67,14 @@ function workwork() {
   //maybe user is on search-result page?
   if (isVoid(items)) {
     items = document.getElementsByClassName('SearchResult-Card')
+  }
+
+  if (isVoid(items) && unsafeWindow.proMap.imageRender) {
+    items = document.getElementsByClassName('AnswerCard')
+  }
+
+  if (isVoid(items)) {
+    return
   }
   //consume each item
   Array.prototype.forEach.call(items, item => consumer(item))
@@ -71,9 +88,13 @@ function workwork() {
 * @description set color via item self-defined data attrs
 * @param {HTML Element} item
 * @since 0.1
-* @version 0.2
+* @version 0.4
 */
 function consumer(item) {
+
+  if (unsafeWindow.proMap.imageRender) {
+    imageReArrangeFactory(item)
+  }
 
   const feed = item.getElementsByClassName('Feed')
   if (feed.length === 0) {
@@ -172,12 +193,16 @@ function consumeNormalContainer(item, normalContainer) {
 * @description set color of Main Block
 * @param {HTML Element} item, which to be colored
 * @since 0.1
+* @version 0.3
 */
 function setColorMain(item, type) {
   const color = unsafeWindow.colorMap[type]
   item.style.backgroundColor = color
+
   //test accessability
-  setAccessability(item, type)
+  if (unsafeWindow.proMap.accessability) {
+    setAccessability(item, type)
+  }
 }
 
 
@@ -198,7 +223,7 @@ function setColorActionbar(item, type) {
   if (innerActionBar.length > 0) {
     innerActionBar[0].style.backgroundColor = unsafeWindow.colorMap[type]
   }
-
+  
 }
 
 /**
@@ -216,14 +241,14 @@ function setAccessability(item, type) {
   type = type.toLowerCase()
 
   const accessTypeContainer = document.createElement('div')
-
+  
   accessTypeContainer.setAttribute('aria-labelledby', 'zcrender-golden-retriever')
   accessTypeContainer.classList.add('zcrender-golden-retriever')
   accessTypeContainer.style.width = 0
   accessTypeContainer.style.height = 0
   accessTypeContainer.style.position = 'absolute'
   accessTypeContainer.style.top = '-10000px'
-
+  
   if (!isVoid(unsafeWindow.descMap[type])) {
     accessTypeContainer.textContent = unsafeWindow.descMap[type]
   }
@@ -234,6 +259,90 @@ function setAccessability(item, type) {
   }
 
 }
+
+
+/**
+* @method imageReArrangeFactory
+* @description re-arrange image factory
+* @param {HTMLElement} item
+* @since 0.4
+* @version 0.4
+*/
+function imageReArrangeFactory(item) {
+  
+  const allImageContainer = item.getElementsByClassName('RichContent-inner')[0]
+  if (isVoid(allImageContainer)) {
+    return
+  }bvn 
+
+  const allImages = allImageContainer.getElementsByTagName('img')
+  const allGifs = allImageContainer.getElementsByClassName('RichText-gifPlaceholder')
+  if (!isVoid(allImages)) {
+    Array.prototype.forEach.call(allImages, img => reArrange(img))
+  }
+  if (!isVoid(allGifs)) {
+    Array.prototype.forEach.call(allGifs, img => reArrange(img))
+  }
+
+}
+
+/**
+* @method reArrange
+* @description re-arrange image
+* @param {HTMLImageElement} img
+* @since 0.4
+* @version 0.4
+*/
+function reArrange(img) {
+  
+  const parentNode = img.parentElement
+
+  if (parentNode.tagName.toLowerCase() !== 'figure') {
+    return
+  }
+
+  if (!isVoid(img.getAttribute('zcrender-pan'))) {
+    return
+  }
+
+  const oriHeight = img.style.height
+  const newHeight = '1px'
+
+  img.style.height = newHeight
+  img.setAttribute('zcrender-pan', 'true')
+
+  const restoreBtn = document.createElement('button')
+  restoreBtn.style.outline = 'none'
+  const restoreText = '恢复图片'
+  const panText = '拍扁图片'
+  restoreBtn.textContent = restoreText
+  restoreBtn.style.backgroundColor = unsafeWindow.colorMap.btn
+  restoreBtn.style.boxSizing = 'border-box'
+  restoreBtn.style.padding = '3px 6px'
+  restoreBtn.style.color = unsafeWindow.colorMap.btntext
+  restoreBtn.style.fontSize = '12px'
+  restoreBtn.style.zIndex = '9999'
+  restoreBtn.onmouseenter = function () {
+    restoreBtn.style.backgroundColor = unsafeWindow.colorMap.default
+  }
+  restoreBtn.onmouseleave = function () {
+    restoreBtn.style.backgroundColor = unsafeWindow.colorMap.btn
+  }
+  
+  
+  restoreBtn.onclick = function () {
+    const newPanValue = img.getAttribute('zcrender-pan') === 'true' ? 'false' : 'true'
+    const newPanText = img.getAttribute('zcrender-pan') === 'false' ? restoreText : panText
+    const newPanHeight = img.getAttribute('zcrender-pan') === 'false' ? newHeight : oriHeight
+    img.setAttribute('zcrender-pan', newPanValue)
+    img.style.height = newPanHeight
+    restoreBtn.textContent = newPanText
+  }
+
+  parentNode.insertBefore(restoreBtn, img)
+
+}
+
 
 /**
 * @method isVoid
