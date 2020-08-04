@@ -1,3 +1,8 @@
+zhihuColorRenderPro 0.5
+---------------------
+1. collapse all gif with a restore btn
+
+
 zhihuColorRenderPro 0.4
 ---------------------
 1. collapse all image with a restore btn

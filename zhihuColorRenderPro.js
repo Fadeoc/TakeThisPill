@@ -13,7 +13,7 @@
  * @method mordenHappyProgrammerAlias
  * @description just a shell, lol
  * @since 0.1
- * @version 0.4
+ * @version 0.5
  */
 (function () {
   //dear sir, you could custom color here
@@ -269,7 +269,7 @@ function setAccessability(item, type) {
 * @description re-arrange image factory
 * @param {HTMLElement} item
 * @since 0.4
-* @version 0.4
+* @version 0.5
 */
 function imageReArrangeFactory(item) {
 
@@ -294,7 +294,7 @@ function imageReArrangeFactory(item) {
 * @description re-arrange image
 * @param {HTMLImageElement} img
 * @since 0.4
-* @version 0.4
+* @version 0.5
 */
 function reArrange(img) {
 
