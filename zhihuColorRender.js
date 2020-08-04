@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         zhihuColorRender
 // @namespace    http://io.github.fadeoc/
-// @version      0.3
+// @version      0.4
 // @description  color, color, how cute!~
 // @author       unwilling to leave name Mr. Fadeoc
 // @match        http*://www.zhihu.com/*
@@ -13,7 +13,7 @@
  * @method mordenHappyProgrammerAlias
  * @description just a shell, lol
  * @since 0.1
- * @version 0.3
+ * @version 0.4
  */
 (function () {
   //dear sir, you could custom color here
@@ -35,6 +35,10 @@
     post: '这是一篇发布',
     zvideo: '这是一部视频',
     relevant: '这是您搜索结果的相关内容推荐链接区域'
+  }
+  unsafeWindow.basicMap = {
+    accessability: false
+
   }
   //and this is check interval, by seconds, change this value could tune the speed of checking, thus save your browser performance
   unsafeWindow.timefrag = 1
@@ -59,8 +63,11 @@ function workwork() {
   if (isVoid(items)) {
     items = document.getElementsByClassName('SearchResult-Card')
   }
-  //consume each item
-  Array.prototype.forEach.call(items, item => consumer(item))
+
+  if (!isVoid(items)) {
+    //consume each item
+    Array.prototype.forEach.call(items, item => consumer(item))
+  }
 
   //future update would be nice with scrolling detecting
   setTimeout(workwork, unsafeWindow.timefrag * 1000)
@@ -171,13 +178,16 @@ function consumeNormalContainer(item, normalContainer) {
 /**
 * @description set color of Main Block
 * @param {HTML Element} item, which to be colored
-* @since 0.1
+* @since 0.4
 */
 function setColorMain(item, type) {
   const color = unsafeWindow.colorMap[type]
   item.style.backgroundColor = color
+
   //test accessability
-  setAccessability(item, type)
+  if (unsafeWindow.basicMap.accessability) {
+    setAccessability(item, type)
+  }
 }
 
 
