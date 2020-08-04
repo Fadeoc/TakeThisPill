@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         zhihuColorRenderPro
 // @namespace    http://io.github.fadeoc/
-// @version      0.4
+// @version      0.6
 // @description  really? pro?
 // @author       unwilling to leave name Mr. Fadeoc
 // @match        http*://www.zhihu.com/*
@@ -61,7 +61,7 @@
 * @method mordenHappyProgrammerAlias
 * @description just a shell, lol
 * @since 0.1
-* @version 0.4
+* @version 0.6
 * @todo scrolling detecting against setTimeout
 */
 function workwork() {
@@ -73,7 +73,7 @@ function workwork() {
   }
 
   if (isVoid(items) && unsafeWindow.proMap.imageRender) {
-    items = document.getElementsByClassName('AnswerCard')
+    items = document.getElementsByClassName('AnswerItem')
   }
 
   if (!isVoid(items)) {
