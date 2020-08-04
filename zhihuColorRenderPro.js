@@ -42,7 +42,7 @@
     colorRender: true,
     imageRender: true,
     accessability: false
-    
+
   }
   //and this is check interval, by seconds, change this value could tune the speed of checking, thus save your browser performance
   unsafeWindow.timefrag = 1
@@ -223,7 +223,7 @@ function setColorActionbar(item, type) {
   if (innerActionBar.length > 0) {
     innerActionBar[0].style.backgroundColor = unsafeWindow.colorMap[type]
   }
-  
+
 }
 
 /**
@@ -241,14 +241,14 @@ function setAccessability(item, type) {
   type = type.toLowerCase()
 
   const accessTypeContainer = document.createElement('div')
-  
+
   accessTypeContainer.setAttribute('aria-labelledby', 'zcrender-golden-retriever')
   accessTypeContainer.classList.add('zcrender-golden-retriever')
   accessTypeContainer.style.width = 0
   accessTypeContainer.style.height = 0
   accessTypeContainer.style.position = 'absolute'
   accessTypeContainer.style.top = '-10000px'
-  
+
   if (!isVoid(unsafeWindow.descMap[type])) {
     accessTypeContainer.textContent = unsafeWindow.descMap[type]
   }
@@ -269,11 +269,11 @@ function setAccessability(item, type) {
 * @version 0.4
 */
 function imageReArrangeFactory(item) {
-  
+
   const allImageContainer = item.getElementsByClassName('RichContent-inner')[0]
   if (isVoid(allImageContainer)) {
     return
-  }bvn 
+  }
 
   const allImages = allImageContainer.getElementsByTagName('img')
   const allGifs = allImageContainer.getElementsByClassName('RichText-gifPlaceholder')
@@ -294,7 +294,7 @@ function imageReArrangeFactory(item) {
 * @version 0.4
 */
 function reArrange(img) {
-  
+
   const parentNode = img.parentElement
 
   if (parentNode.tagName.toLowerCase() !== 'figure') {
@@ -328,8 +328,8 @@ function reArrange(img) {
   restoreBtn.onmouseleave = function () {
     restoreBtn.style.backgroundColor = unsafeWindow.colorMap.btn
   }
-  
-  
+
+
   restoreBtn.onclick = function () {
     const newPanValue = img.getAttribute('zcrender-pan') === 'true' ? 'false' : 'true'
     const newPanText = img.getAttribute('zcrender-pan') === 'false' ? restoreText : panText
