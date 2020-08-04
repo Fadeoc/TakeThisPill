@@ -76,11 +76,10 @@ function workwork() {
     items = document.getElementsByClassName('AnswerCard')
   }
 
-  if (isVoid(items)) {
-    return
+  if (!isVoid(items)) {
+    //consume each item
+    Array.prototype.forEach.call(items, item => consumer(item))
   }
-  //consume each item
-  Array.prototype.forEach.call(items, item => consumer(item))
 
   //future update would be nice with scrolling detecting
   setTimeout(workwork, unsafeWindow.timefrag * 1000)
