@@ -8,16 +8,14 @@ TakeThisPill
     #roadmap: (if I have time)
     + better performance, get rid of setinterval
     + better code, all es6
-    + better code style, stop copying :)
-    + sure better UI
+    + better code structure, stop copying :)
+    + better GUI
 2. zhihuColorRender  
     #description: Zhihu timeline/searchresult block color render, help tell a block is Answer, Article, Post, Ads, Video etc.  
     #support: Microsoft New Edge, Chrome/Firefox(not tested)  
     #accessbility: yes  
     #version: 0.3  
-    #roadmap: (if I have time)
-    + GUI
-
+    #roadmap: end
 3. zhihuColorRenderPro  
     #description: zhihuColorRender + image/gif block with restore btn each  
     #support: Microsoft New Edge, Chrome/Firefox(not tested)  
@@ -25,3 +23,4 @@ TakeThisPill
     #version: 0.4  
     #roadmap: (if I have time)
     + GUI
+    + better code structure
