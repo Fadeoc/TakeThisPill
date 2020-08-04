@@ -19,7 +19,7 @@ TakeThisPill
     + GUI
 
 3. zhihuColorRenderPro  
-    #description: Zhihu timeline/searchresult block color render, help tell a block is Answer, Article, Post, Ads, Video etc.  
+    #description: zhihuColorRender + image/gif block with restore btn each  
     #support: Microsoft New Edge, Chrome/Firefox(not tested)  
     #accessbility: default shutdown  
     #version: 0.4  
