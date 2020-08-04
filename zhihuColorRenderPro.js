@@ -25,7 +25,10 @@
     post: '#e8c15f',
     zvideo: '#af739a',
     relevant: 'green',
-    btn: 'green',
+    btnimg: 'green',
+    btnimghover: '#9aaf73',
+    btngif: '#af739a',
+    btngifhover: '#cc7c8a',
     btntext: '#f8f8f8',
   }
   //accessbility
@@ -276,7 +279,7 @@ function imageReArrangeFactory(item) {
   }
 
   const allImages = allImageContainer.getElementsByTagName('img')
-  const allGifs = allImageContainer.getElementsByClassName('RichText-gifPlaceholder')
+  const allGifs = allImageContainer.getElementsByClassName('ztext-gif')
   if (!isVoid(allImages)) {
     Array.prototype.forEach.call(allImages, img => reArrange(img))
   }
@@ -295,15 +298,23 @@ function imageReArrangeFactory(item) {
 */
 function reArrange(img) {
 
-  const parentNode = img.parentElement
+  let parentNode = img.parentElement
 
-  if (parentNode.tagName.toLowerCase() !== 'figure') {
+  const isGif = parentNode.classList.contains('GifPlayer') ? true : false
+
+  if (parentNode.tagName.toLowerCase() !== 'figure' && !isGif) {
     return
   }
 
   if (!isVoid(img.getAttribute('zcrender-pan'))) {
     return
   }
+
+  if (isGif) {
+    parentNode = parentNode.parentElement.parentElement
+  }
+
+  parentNode.style.textAlign = 'center'
 
   const oriHeight = img.style.height
   const newHeight = '1px'
@@ -313,20 +324,20 @@ function reArrange(img) {
 
   const restoreBtn = document.createElement('button')
   restoreBtn.style.outline = 'none'
-  const restoreText = '恢复图片'
-  const panText = '拍扁图片'
+  const restoreText = isGif ? '恢复Gif' : '恢复图片'
+  const panText = isGif ? '拍扁Gif' : '拍扁图片'
   restoreBtn.textContent = restoreText
-  restoreBtn.style.backgroundColor = unsafeWindow.colorMap.btn
+  restoreBtn.style.backgroundColor = isGif ? unsafeWindow.colorMap.btngif : unsafeWindow.colorMap.btnimg
   restoreBtn.style.boxSizing = 'border-box'
   restoreBtn.style.padding = '3px 6px'
   restoreBtn.style.color = unsafeWindow.colorMap.btntext
   restoreBtn.style.fontSize = '12px'
   restoreBtn.style.zIndex = '9999'
   restoreBtn.onmouseenter = function () {
-    restoreBtn.style.backgroundColor = unsafeWindow.colorMap.default
+    restoreBtn.style.backgroundColor = isGif ? unsafeWindow.colorMap.btngifhover : unsafeWindow.colorMap.btnimghover
   }
   restoreBtn.onmouseleave = function () {
-    restoreBtn.style.backgroundColor = unsafeWindow.colorMap.btn
+    restoreBtn.style.backgroundColor = isGif ? unsafeWindow.colorMap.btngif : unsafeWindow.colorMap.btnimg
   }
 
 
@@ -339,7 +350,8 @@ function reArrange(img) {
     restoreBtn.textContent = newPanText
   }
 
-  parentNode.insertBefore(restoreBtn, img)
+  // parentNode.insertBefore(restoreBtn, img)
+  parentNode.prepend(restoreBtn)
 
 }
 
