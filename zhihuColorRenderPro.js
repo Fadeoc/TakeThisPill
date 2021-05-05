@@ -1,16 +1,16 @@
 // ==UserScript==
 // @name         zhihuColorRenderPro
 // @namespace    http://io.github.fadeoc/
-// @version      0.6
+// @version      0.8
 // @description  really? pro?
 // @author       unwilling to leave name Mr. Fadeoc
 // @match        http*://www.zhihu.com/*
 // @include      http*://www.zhihu.com/*
+// @grant GM_getValue
+// @grant GM_setValue
 // ==/UserScript==
-
-
 /**
- * @method mordenHappyProgrammerAlias
+ * @method modernHappyProgrammerAlias
  * @description just a shell, lol
  * @since 0.1
  * @version 0.5
@@ -22,14 +22,20 @@
     answer: '',
     ads: 'grey',
     article: '#e8c15f',
+    magzine: '#e8c15f',
     post: '#e8c15f',
     zvideo: '#af739a',
     relevant: 'green',
+    blocklist: '#000000',
     btnimg: 'green',
     btnimghover: '#9aaf73',
     btngif: '#af739a',
     btngifhover: '#cc7c8a',
     btntext: '#f8f8f8',
+    btnSaleLinkFolderBg: '#5e83bf',
+    btnSaleLinkFolderBgHover: '#89b2f5',
+    btnSaleLinkFolderText: '#f8f8f8',
+
   }
   //accessbility
   unsafeWindow.descMap = {
@@ -37,6 +43,7 @@
     answer: '这是一个回答',
     ads: '这是一支广告',
     article: '这是一篇文章',
+    magzine: '这是一篇电子杂志',
     post: '这是一篇发布',
     zvideo: '这是一部视频',
     relevant: '这是您搜索结果的相关内容推荐链接区域'
@@ -44,14 +51,15 @@
   unsafeWindow.proMap = {
     colorRender: true,
     imageRender: true,
-    accessability: false
-
+    accessability: false,
+    blocklist: []
   }
   //and this is check interval, by seconds, change this value could tune the speed of checking, thus save your browser performance
   unsafeWindow.timefrag = 1
 
   //orcs, go to work!
   console.log('more work?')
+  setInput()
   workwork()
 
 })()
@@ -61,17 +69,18 @@
 * @method mordenHappyProgrammerAlias
 * @description just a shell, lol
 * @since 0.1
-* @version 0.6
+* @version 0.8
 * @todo scrolling detecting against setTimeout
 */
 function workwork() {
+
   //get all feed items collection
   let items = document.getElementsByClassName('TopstoryItem')
   //maybe user is on search-result page?
   if (isVoid(items)) {
     items = document.getElementsByClassName('SearchResult-Card')
   }
-
+  //or single question page?
   if (isVoid(items) && unsafeWindow.proMap.imageRender) {
     items = document.getElementsByClassName('AnswerItem')
   }
@@ -81,14 +90,100 @@ function workwork() {
     Array.prototype.forEach.call(items, item => consumer(item))
   }
 
+  items = document.getElementsByClassName('ArticleItem')
+  if (!isVoid(items)) {
+    //consume each item
+    Array.prototype.forEach.call(items, item => consumer(item))
+  }
+
+  //collapse sale-cards
+  const salecards = document.getElementsByClassName('MCNLinkCard') || []
+  if (salecards.length > 0) {
+    Array.prototype.forEach.call(salecards, card => foldElement(
+      card,
+      unsafeWindow.colorMap.btnSaleLinkFolderText,
+      unsafeWindow.colorMap.btnSaleLinkFolderBg,
+      unsafeWindow.colorMap.btnSaleLinkFolderBgHover
+    ))
+  }
+
   //future update would be nice with scrolling detecting
   setTimeout(workwork, unsafeWindow.timefrag * 1000)
+}
+
+function setButtonStyle(btn, label, onclick) {
+  btn.style.width = "150px"
+  btn.style.height = "30px"
+  btn.style.padding = "2px"
+  btn.style.cursor = "pointer"
+  btn.textContent = label
+  btn.addEventListener("click", onclick, false)
+}
+
+function setInput() {
+  var btn = document.body.appendChild(document.createElement("button"))
+  btn.style.position = "fixed"
+  btn.style.top = 0
+  btn.style.left = "10%"
+  btn.style.marginLeft = "-100px"
+  btn.style.zIndex = 10006
+  btn.style.backgroundColor = "#556B2F"
+  btn.style.color = "#FFFFFF"
+  btn.style.border = "none"
+
+  // Edit URL list
+  setButtonStyle(btn, "知乎彩色渲染器(Pro)", function () {
+    var con = document.body.appendChild(document.createElement("div"))
+    con.style.position = "fixed"
+    con.style.top = 0
+    con.style.right = 0
+    con.style.zIndex = 1000
+    con.style.padding = "1px 2px"
+    con.style.textAlign = "center"
+
+    function append(name) {
+      return con.appendChild(document.createElement(name))
+    }
+
+    append("br")
+
+    var ta = append("textarea")
+    con.getElementsByTagName("textarea")[0].setAttribute("placeholder", "屏蔽用户名（染成黑色），每个用户名换一行")
+    ta.cols = 50
+    ta.rows = 25
+    ta.value = GM_getValue("urls") || ""
+
+    append("br")
+
+    setButtonStyle(append("button"), "Cancel", function () {
+      document.body.removeChild(con)
+    })
+
+    var spacer = append("span")
+    spacer.textContent = " "
+    spacer.style.padding = "0 50px"
+
+    setButtonStyle(append("button"), "Save", function () {
+      GM_setValue("urls", ta.value.trim())
+      location.reload()
+    })
+  })
+}
+
+function getInput() {
+  var urls = GM_getValue("urls")
+  if (!urls) {
+    return null
+  }
+  else {
+    return urls.replace(/\n/g, ",").split(",")
+  }
 }
 
 /**
 * @method consumer
 * @description set color via item self-defined data attrs
-* @param {HTML Element} item
+* @param {HTMLElement} item
 * @since 0.1
 * @version 0.4
 */
@@ -99,15 +194,19 @@ function consumer(item) {
   }
 
   const feed = item.getElementsByClassName('Feed')
+
   if (feed.length === 0) {
     const feed = item.getElementsByClassName('Pc-feedAd-container')
     if (feed.length === 0) {
       if (item.classList.contains('SearchResult-Card')) {
         consumeSearchContainer(item)
       }
+      else if (item.classList.contains('ArticleItem')) {
+        setColorMain(item, 'article')
+        setColorActionbar(item, 'article')
+      }
       else {
         console.log('Damn! found a leak, things change, roll with the punches')
-        return
       }
     }
     else {
@@ -118,12 +217,14 @@ function consumer(item) {
     consumeNormalContainer(item, feed[0])
   }
 
+  consumeBlocklistContainer(item)
+
 }
 
 /**
 * @method consumeSearchContainer
 * @description consume search-result block
-* @param {HTML Element} item
+* @param {HTMLElement} item
 * @since 0.2
 * @version 0.2
 */
@@ -133,18 +234,80 @@ function consumeSearchContainer(item) {
     setColorMain(item, 'relavent')
   }
   else if (!isVoid(item.getAttribute('data-za-extra-module'))) {
-    const data = item.getAttribute('data-za-extra-module')
-    const json = JSON.parse(data)
-    contentType = json.card.content.type
-    setColorMain(item, contentType.toLowerCase())
-    setColorActionbar(item, contentType.toLowerCase())
+    const magzineList = item.getElementsByClassName('KfeCollection-PcCollegeCard-wrapper') || []
+    if (magzineList.length !== 0) {
+      setColorMain(item, 'magzine')
+      setColorActionbar(item, 'magzine')
+    }
+    else {
+      const data = item.getAttribute('data-za-extra-module')
+      const json = JSON.parse(data)
+      const contentType = json["card"].content.type
+      setColorMain(item, contentType.toLowerCase())
+      setColorActionbar(item, contentType.toLowerCase())
+      const authorElement = item.getElementsByClassName('AuthorInfo')
+      if (!isVoid(authorElement)) {
+        const authorNameMeta = authorElement[0].getElementsByTagName('meta')[0]
+        const finalBlockList = getBlockList()
+        if (!isVoid(authorNameMeta) && finalBlockList.indexOf(authorNameMeta.getAttribute('content')) !== -1) {
+          setColorMain(item, 'blocklist')
+          setColorActionbar(item, 'blocklist')
+        }
+      }
+    }
   }
+}
+
+/**
+* @method consumeAnswerContainer
+* @description consume questionanswer-content block
+* @param {HTMLElement} item
+* @since 0.7
+* @version 0.7
+*/
+function consumeBlocklistContainer(item) {
+  let data = null
+  if (!isVoid(item.getAttribute('data-zop'))) {
+    data = item.getAttribute('data-zop')
+  }
+  else if (!isVoid(item.getElementsByClassName('ContentItem')) && !isVoid(item.getElementsByClassName('ContentItem')[0].getAttribute('data-zop'))){
+    data = item.getElementsByClassName('ContentItem')[0].getAttribute('data-zop')
+  }
+  if (isVoid(data)) {
+    return
+  }
+
+  const json = JSON.parse(data)
+  const finalBlockList = getBlockList()
+  if (finalBlockList.indexOf(json["authorName"]) !== -1) {
+    const introCard = item.getElementsByClassName('KfeCollection-IntroCard')[0]
+    if (!isVoid(introCard)) {
+      setColorMain(introCard, 'blocklist')
+    }
+    setColorMain(item, 'blocklist')
+    setColorActionbar(item, 'blocklist')
+    const rightButton = item.getElementsByClassName('ContentItem-rightButton')[0]
+    const expandBtn = item.getElementsByClassName('ContentItem-expandButton')[0]
+    if (!isVoid(rightButton) && isVoid(expandBtn)) {
+      rightButton.click()
+    }
+  }
+}
+
+function getBlockList() {
+  let customBlockList = []
+  try {
+    customBlockList = getInput() == null ? [] : getInput()
+  } catch (e) {
+    console.log("自定义屏蔽列表格式错误，已启用默认列表")
+  }
+  return customBlockList.length === 0 ? unsafeWindow.proMap.blocklist : customBlockList
 }
 
 /**
 * @method consumeAdsContainer
 * @description consume ads block, it may already blocked by adblock, adblock plus, ublock or other plugins, again, this script doesn't block ads
-* @param {HTML Element} item
+* @param {HTMLElement} item
 * @since 0.1
 */
 function consumeAdsContainer(item) {
@@ -156,18 +319,21 @@ function consumeAdsContainer(item) {
 /**
 * @method consumeNormalContainer
 * @description consume normal block
-* @param {HTML Element} item
-* @param {HTML Element} normalContainer
+* @param {HTMLElement} item
+* @param {Element} normalContainer
 * @since 0.1
 * @version 0.3
 */
 function consumeNormalContainer(item, normalContainer) {
   let data = normalContainer.getAttribute('data-za-extra-module')
-  let contentType = ''
+  let contentType
   if (data == null) {
     const messFeedContainer = normalContainer.getElementsByClassName('ContentItem')[0]
     if (!isVoid(messFeedContainer) && messFeedContainer.classList.contains('ZVideoItem')) {
       contentType = 'zvideo'
+    }
+    else if (!isVoid(messFeedContainer) && messFeedContainer.classList.contains('ArticleItem')) {
+      contentType = 'article'
     }
     else {
       data = messFeedContainer.getAttribute('data-zop')
@@ -177,7 +343,7 @@ function consumeNormalContainer(item, normalContainer) {
   }
   else {
     const json = JSON.parse(data)
-    contentType = json.card.content.type
+    contentType = json["card"].content.type
   }
 
   if (unsafeWindow.colorMap.hasOwnProperty(contentType.toLowerCase())) {
@@ -192,27 +358,34 @@ function consumeNormalContainer(item, normalContainer) {
 
 
 /**
-* @description set color of Main Block
-* @param {HTML Element} item, which to be colored
-* @since 0.1
-* @version 0.3
-*/
+ * @description set color of Main Block
+ * @param {HTMLElement} item, which to be colored
+ * @param type
+ * @since 0.1
+ * @version 0.3
+ */
 function setColorMain(item, type) {
-  const color = unsafeWindow.colorMap[type]
-  item.style.backgroundColor = color
 
+  item.style.backgroundColor = unsafeWindow.colorMap[type]
+  if (unsafeWindow.colorMap[type] === 'hide') {
+    item.style.display = "none";
+  }
   //test accessability
   if (unsafeWindow.proMap.accessability) {
     setAccessability(item, type)
   }
+
+  if (type === 'blocklist') {
+    item.style.color = '#000000'
+  }
 }
 
-
 /**
-* @description set color of Action Bar
-* @param {HTML Element} item, ancestor of the action bar which to be colored
-* @since 0.1
-*/
+ * @description set color of Action Bar
+ * @param {HTMLElement} item, ancestor of the action bar which to be colored
+ * @param type
+ * @since 0.1
+ */
 function setColorActionbar(item, type) {
   const actionBar = item.getElementsByClassName('ContentItem-actions')
   if (isVoid(actionBar)) {
@@ -220,21 +393,35 @@ function setColorActionbar(item, type) {
     return
   }
   item.style.backgroundColor = unsafeWindow.colorMap[type]
-  actionBar[0].style.backgroundColor = unsafeWindow.colorMap[type]
-  const innerActionBar = actionBar[0].getElementsByClassName('ContentItem-action')
-  if (innerActionBar.length > 0) {
-    innerActionBar[0].style.backgroundColor = unsafeWindow.colorMap[type]
+  if (unsafeWindow.colorMap[type] === 'hide') {
+    item.style.display = "none";
   }
-
+  actionBar[0].style.backgroundColor = unsafeWindow.colorMap[type]
+  const innerActionBars = actionBar[0].getElementsByClassName('ContentItem-action')
+  if (innerActionBars.length > 0) {
+    Array.prototype.forEach.call(innerActionBars, innerActionBar => {
+      innerActionBar.style.backgroundColor = unsafeWindow.colorMap[type]
+      if (unsafeWindow.colorMap[type] === 'hide') {
+        innerActionBar.style.display = "none";
+      }
+      const btns = innerActionBar.getElementsByTagName('button')
+      if (type === 'blocklist') {
+        item.style.color = unsafeWindow.colorMap.blocklist
+        innerActionBar.style.color = unsafeWindow.colorMap.blocklist
+        Array.prototype.forEach.call(btns, btn => btn.style.color = unsafeWindow.colorMap.blocklist)
+      }
+    })
+  }
 }
 
 /**
-* @method setAccessability
-* @description set accessability
-* @param {HTML Element} item
-* @since 0.3
-* @version 0.3
-*/
+ * @method setAccessability
+ * @description set accessability
+ * @param {HTMLElement} item
+ * @param type
+ * @since 0.3
+ * @version 0.3
+ */
 function setAccessability(item, type) {
   if (!isVoid(item.getElementsByClassName('zcrender-golden-retriever')[0])) {
     return
@@ -246,8 +433,8 @@ function setAccessability(item, type) {
 
   accessTypeContainer.setAttribute('aria-labelledby', 'zcrender-golden-retriever')
   accessTypeContainer.classList.add('zcrender-golden-retriever')
-  accessTypeContainer.style.width = 0
-  accessTypeContainer.style.height = 0
+  accessTypeContainer.style.width = "0"
+  accessTypeContainer.style.height = "0"
   accessTypeContainer.style.position = 'absolute'
   accessTypeContainer.style.top = '-10000px'
 
@@ -289,6 +476,65 @@ function imageReArrangeFactory(item) {
 }
 
 /**
+ * @method foldElement
+ * @description fold HTML element. The function simply fold the element without do any thing but add a restore/fold btn
+ * @param {HTMLImageElement} _element
+ * @param {String<HexColor>} btnTextColor
+ * @param {String<HexColor>} btnBgColor
+ * @param {String<HexColor>} btnBgHoverColor
+ * @since 0.8
+ * @version 0.8
+ */
+function foldElement(_element, btnTextColor, btnBgColor, btnBgHoverColor) {
+
+  if (!isVoid(_element.getAttribute('zcrender-pan'))) {
+    return
+  }
+
+  const oriHeight = _element.style.height
+  const oriMinHeight = _element.style.minHeight
+  const newHeight = '1px'
+  const newMinHeight = '1px'
+
+  _element.style.height = newHeight
+  _element.style.minHeight = newMinHeight
+  _element.setAttribute('zcrender-pan', 'true')
+
+  const restoreBtn = document.createElement('button')
+  restoreBtn.style.outline = 'none'
+  const restoreText = '恢复商品连接'
+  const panText = '拍扁商品连接'
+  restoreBtn.textContent = restoreText
+  restoreBtn.style.backgroundColor = btnBgColor
+  restoreBtn.style.boxSizing = 'border-box'
+  restoreBtn.style.padding = '3px 6px'
+  restoreBtn.style.color = btnTextColor
+  restoreBtn.style.fontSize = '12px'
+  restoreBtn.style.zIndex = '9999'
+  restoreBtn.onmouseenter = function () {
+    restoreBtn.style.backgroundColor = btnBgHoverColor
+  }
+  restoreBtn.onmouseleave = function () {
+    restoreBtn.style.backgroundColor = btnBgColor
+  }
+
+
+  restoreBtn.onclick = function () {
+    const newPanValue = _element.getAttribute('zcrender-pan') === 'true' ? 'false' : 'true'
+    const newPanText = _element.getAttribute('zcrender-pan') === 'false' ? restoreText : panText
+    const newPanHeight = _element.getAttribute('zcrender-pan') === 'false' ? newHeight : oriHeight
+    const newPanMinHeight = _element.getAttribute('zcrender-pan') === 'false' ? newMinHeight : oriMinHeight
+    _element.setAttribute('zcrender-pan', newPanValue)
+    _element.style.height = newPanHeight
+    _element.style.minHeight = newPanMinHeight
+    restoreBtn.textContent = newPanText
+  }
+  _element.parentElement.style.textAlign = 'center'
+  _element.parentElement.insertBefore(restoreBtn, _element)
+
+}
+
+/**
 * @method reArrange
 * @description re-arrange image
 * @param {HTMLImageElement} img
@@ -299,7 +545,7 @@ function reArrange(img) {
 
   let parentNode = img.parentElement
 
-  const isGif = parentNode.classList.contains('GifPlayer') ? true : false
+  const isGif = parentNode.classList.contains('GifPlayer')
 
   if (parentNode.tagName.toLowerCase() !== 'figure' && !isGif) {
     return
