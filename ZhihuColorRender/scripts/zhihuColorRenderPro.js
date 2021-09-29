@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         zhihuColorRenderPro
 // @namespace    http://io.github.fadeoc/
-// @version      0.8
+// @version      0.9
 // @description  really? pro?
 // @author       unwilling to leave name Mr. Fadeoc
 // @match        http*://www.zhihu.com/*
@@ -15,7 +15,6 @@
  * @since 0.1
  * @version 0.5
  */
-console.log(11111111111111)
 let unsafeWindow = {};
 (function () {
   //dear sir, you could custom color here
@@ -26,7 +25,9 @@ let unsafeWindow = {};
     article: '#e8c15f',
     magzine: '#e8c15f',
     post: '#e8c15f',
-    zvideo: '#af739a',
+    zvideo: 'hide',
+    zBanner: 'hide',
+    vipBanner: 'hide',
     relevant: 'green',
     blocklist: '#000000',
     btnimg: 'green',
@@ -61,7 +62,7 @@ let unsafeWindow = {};
 
   //orcs, go to work!
   console.log('more work?')
-  setInput()
+  // setInput()
   workwork()
 
 })()
@@ -75,15 +76,37 @@ let unsafeWindow = {};
 * @todo scrolling detecting against setTimeout
 */
 function workwork() {
+  let items;
+
+  //main page banner
+  const zBannerCon = document.getElementsByClassName('Topstory--old')[0]
+  if (!isVoid(zBannerCon) && unsafeWindow.colorMap.zBanner === 'hide') {
+    const banners = this.getChildrenClassNameExcludeStr(zBannerCon, 'Topstory-container')
+    banners.forEach(banner =>  banner.style.display = 'none')
+  }
+
+  //vip page banner
+  const app = document.getElementById('app')
+  if (!isVoid(app) && unsafeWindow.colorMap.vipBanner === 'hide') {
+    const listAppRoot = this.getChildrenClassNameIncludeStr(app, 'App-root')
+    const listBannerRoot = this.getChildrenClassNameIncludeStr(listAppRoot, 'CarouselBanner-root')
+    const listTopNavBar = this.getChildrenClassNameIncludeStr(listBannerRoot, 'TopNavBar-root')
+    const TopNavBarHeight = listTopNavBar[0].clientHeight
+    const listBanners = this.getChildrenClassNameIncludeStr(listBannerRoot, 'CarouselBanner')
+    listBanners.forEach(banner => banner.style.display = 'None')
+    listBannerRoot[0].style.height = `${TopNavBarHeight}px`
+  }
 
   //get all feed items collection
-  let items = document.getElementsByClassName('TopstoryItem')
+  items = document.getElementsByClassName('TopstoryItem')
   //maybe user is on search-result page?
   if (isVoid(items)) {
+    // console.log('page-search-result')
     items = document.getElementsByClassName('SearchResult-Card')
   }
   //or single question page?
   if (isVoid(items) && unsafeWindow.proMap.imageRender) {
+    // console.log('page-single-question')
     items = document.getElementsByClassName('AnswerItem')
   }
 
@@ -123,63 +146,63 @@ function setButtonStyle(btn, label, onclick) {
 }
 
 function setInput() {
-  var btn = document.body.appendChild(document.createElement("button"))
-  btn.style.position = "fixed"
-  btn.style.top = 0
-  btn.style.left = "10%"
-  btn.style.marginLeft = "-100px"
-  btn.style.zIndex = 10006
-  btn.style.backgroundColor = "#556B2F"
-  btn.style.color = "#FFFFFF"
-  btn.style.border = "none"
-
-  // Edit URL list
-  setButtonStyle(btn, "知乎彩色渲染器(Pro)", function () {
-    var con = document.body.appendChild(document.createElement("div"))
-    con.style.position = "fixed"
-    con.style.top = 0
-    con.style.right = 0
-    con.style.zIndex = 1000
-    con.style.padding = "1px 2px"
-    con.style.textAlign = "center"
-
-    function append(name) {
-      return con.appendChild(document.createElement(name))
-    }
-
-    append("br")
-
-    var ta = append("textarea")
-    con.getElementsByTagName("textarea")[0].setAttribute("placeholder", "屏蔽用户名（染成黑色），每个用户名换一行")
-    ta.cols = 50
-    ta.rows = 25
-    ta.value = GM_getValue("urls") || ""
-
-    append("br")
-
-    setButtonStyle(append("button"), "Cancel", function () {
-      document.body.removeChild(con)
-    })
-
-    var spacer = append("span")
-    spacer.textContent = " "
-    spacer.style.padding = "0 50px"
-
-    setButtonStyle(append("button"), "Save", function () {
-      GM_setValue("urls", ta.value.trim())
-      location.reload()
-    })
-  })
+  // var btn = document.body.appendChild(document.createElement("button"))
+  // btn.style.position = "fixed"
+  // btn.style.top = 0
+  // btn.style.left = "10%"
+  // btn.style.marginLeft = "-100px"
+  // btn.style.zIndex = 10006
+  // btn.style.backgroundColor = "#556B2F"
+  // btn.style.color = "#FFFFFF"
+  // btn.style.border = "none"
+  //
+  // // Edit URL list
+  // setButtonStyle(btn, "知乎彩色渲染器(Pro)", function () {
+  //   var con = document.body.appendChild(document.createElement("div"))
+  //   con.style.position = "fixed"
+  //   con.style.top = 0
+  //   con.style.right = 0
+  //   con.style.zIndex = 1000
+  //   con.style.padding = "1px 2px"
+  //   con.style.textAlign = "center"
+  //
+  //   function append(name) {
+  //     return con.appendChild(document.createElement(name))
+  //   }
+  //
+  //   append("br")
+  //
+  //   var ta = append("textarea")
+  //   con.getElementsByTagName("textarea")[0].setAttribute("placeholder", "屏蔽用户名（染成黑色），每个用户名换一行")
+  //   ta.cols = 50
+  //   ta.rows = 25
+  //   ta.value = GM_getValue("urls") || ""
+  //
+  //   append("br")
+  //
+  //   setButtonStyle(append("button"), "Cancel", function () {
+  //     document.body.removeChild(con)
+  //   })
+  //
+  //   var spacer = append("span")
+  //   spacer.textContent = " "
+  //   spacer.style.padding = "0 50px"
+  //
+  //   setButtonStyle(append("button"), "Save", function () {
+  //     GM_setValue("urls", ta.value.trim())
+  //     location.reload()
+  //   })
+  // })
 }
 
 function getInput() {
-  var urls = GM_getValue("urls")
-  if (!urls) {
-    return null
-  }
-  else {
-    return urls.replace(/\n/g, ",").split(",")
-  }
+  // var urls = GM_getValue("urls")
+  // if (!urls) {
+  //   return null
+  // }
+  // else {
+  //   return urls.replace(/\n/g, ",").split(",")
+  // }
 }
 
 /**
@@ -244,7 +267,10 @@ function consumeSearchContainer(item) {
     else {
       const data = item.getAttribute('data-za-extra-module')
       const json = JSON.parse(data)
-      const contentType = json["card"].content.type
+      let contentType = json["card"].content.type
+      if (json["card"]["has_video"]) {
+        contentType = 'zvideo'
+      }
       setColorMain(item, contentType.toLowerCase())
       setColorActionbar(item, contentType.toLowerCase())
       const authorElement = item.getElementsByClassName('AuthorInfo')
@@ -299,9 +325,9 @@ function consumeBlocklistContainer(item) {
 function getBlockList() {
   let customBlockList = []
   try {
-    customBlockList = getInput() == null ? [] : getInput()
+    // customBlockList = getInput() == null ? [] : getInput()
   } catch (e) {
-    console.log("自定义屏蔽列表格式错误，已启用默认列表")
+    // console.log("自定义屏蔽列表格式错误，已启用默认列表")
   }
   return customBlockList.length === 0 ? unsafeWindow.proMap.blocklist : customBlockList
 }
@@ -346,6 +372,9 @@ function consumeNormalContainer(item, normalContainer) {
   else {
     const json = JSON.parse(data)
     contentType = json["card"].content.type
+    if (json["card"]["has_video"]) {
+      contentType = 'zvideo'
+    }
   }
 
   if (unsafeWindow.colorMap.hasOwnProperty(contentType.toLowerCase())) {
@@ -612,4 +641,42 @@ function reArrange(img) {
 */
 function isVoid(object) {
   return object === null || typeof object === 'undefined' || object === '' || object.length === 0
+}
+
+/**
+ *
+ * @param pNode{HTMLElement|Array} node or nodes whose children owns the className list
+ * @param s{string} string to be found in className list
+ * @param exclude return exclude instead of include if true
+ * @return {Array} [] if none found
+ */
+function getChildrenClassNameIncludeStr(pNode, s, exclude = false) {
+  let rootNode
+  if (Array.isArray(pNode)) {
+    rootNode = pNode[0]
+  }
+  else {
+    rootNode = pNode
+  }
+  return Array.prototype.filter.call(rootNode.childNodes, cNode => exclude ? !this.nodeHasClass(cNode, s) : this.nodeHasClass(cNode, s))
+}
+
+/**
+ *
+ * @param pNode{HTMLElement|Array} node or nodes whose children owns the className list
+ * @param s{string} string to match in className list
+ * @return {Array} [] if none found
+ */
+function getChildrenClassNameExcludeStr(pNode, s) {
+  return this.getChildrenClassNameIncludeStr(pNode, s, true)
+}
+
+/**
+ *
+ * @param oneNode{HTMLElement} node who owns the className list
+ * @param s{string} string to be found in className list
+ * @return {boolean}
+ */
+function nodeHasClass(oneNode, s) {
+  return typeof Array.prototype.find.call(oneNode.classList, className => className.includes(s)) !== "undefined"
 }
