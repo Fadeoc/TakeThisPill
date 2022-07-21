@@ -1,5 +1,13 @@
 pro mode
 ========================
+zhihuColorRenderPro 0.10
+---------------------
+1. feature: hot list will blue roundtable items
+========================
+zhihuColorRenderPro 0.9
+---------------------
+1. crx available
+========================
 zhihuColorRenderPro 0.8
 ---------------------
 1. feature: sale-cards now can be folded/unfolded too

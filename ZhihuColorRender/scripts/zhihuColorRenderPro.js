@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         zhihuColorRenderPro
 // @namespace    http://io.github.fadeoc/
-// @version      0.9
+// @version      0.10
 // @description  really? pro?
 // @author       unwilling to leave name Mr. Fadeoc
 // @match        http*://www.zhihu.com/*
@@ -24,6 +24,7 @@ let unsafeWindow = {};
     ads: 'grey',
     article: '#e8c15f',
     magzine: '#e8c15f',
+    roundTable: 'skyblue',
     post: '#e8c15f',
     zvideo: 'hide',
     zBanner: 'hide',
@@ -69,7 +70,7 @@ let unsafeWindow = {};
 
 
 /**
-* @method mordenHappyProgrammerAlias
+* @method modernHappyProgrammerAlias
 * @description just a shell, lol
 * @since 0.1
 * @version 0.8
@@ -110,6 +111,12 @@ function workwork() {
     items = document.getElementsByClassName('AnswerItem')
   }
 
+  //or hot page?
+  if (isVoid(items) && unsafeWindow.proMap.imageRender) {
+    // console.log('page-single-question')
+    items = document.getElementsByClassName('HotItem')
+  }
+
   if (!isVoid(items)) {
     //consume each item
     Array.prototype.forEach.call(items, item => consumer(item))
@@ -122,9 +129,9 @@ function workwork() {
   }
 
   //collapse sale-cards
-  const salecards = document.getElementsByClassName('MCNLinkCard') || []
-  if (salecards.length > 0) {
-    Array.prototype.forEach.call(salecards, card => foldElement(
+  const saleCards = document.getElementsByClassName('MCNLinkCard') || []
+  if (saleCards.length > 0) {
+    Array.prototype.forEach.call(saleCards, card => foldElement(
       card,
       unsafeWindow.colorMap.btnSaleLinkFolderText,
       unsafeWindow.colorMap.btnSaleLinkFolderBg,
@@ -216,6 +223,14 @@ function consumer(item) {
 
   if (unsafeWindow.proMap.imageRender) {
     imageReArrangeFactory(item)
+  }
+
+  if (item.classList.contains('HotItem')) {
+    const c = item.getElementsByClassName('HotItem-content')?.[0]?.getElementsByTagName('a')?.[0]
+    if (c && c.href.includes('roundtable')) {
+      setColorMain(item, 'roundTable')
+      setColorActionbar(item, 'roundTable')
+    }
   }
 
   const feed = item.getElementsByClassName('Feed')
