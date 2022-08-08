@@ -24,6 +24,7 @@ let unsafeWindow = {};
     ads: 'grey',
     article: '#e8c15f',
     magzine: '#e8c15f',
+    zpaid: '#ff730e',
     roundTable: 'skyblue',
     post: '#e8c15f',
     zvideo: 'hide',
@@ -244,6 +245,10 @@ function consumer(item) {
       else if (item.classList.contains('ArticleItem')) {
         setColorMain(item, 'article')
         setColorActionbar(item, 'article')
+      }
+      else if (item.getElementsByClassName('KfeCollection-PaidAnswerFooter').length > 0) {
+        setColorMain(item, 'zpaid')
+        setColorActionbar(item, 'zpaid')
       }
       else {
         console.log('Damn! found a leak, things change, roll with the punches')
