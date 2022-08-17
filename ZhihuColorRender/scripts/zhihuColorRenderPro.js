@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         zhihuColorRenderPro
 // @namespace    http://io.github.fadeoc/
-// @version      0.10
+// @version      0.10B
 // @description  really? pro?
 // @author       unwilling to leave name Mr. Fadeoc
 // @match        http*://www.zhihu.com/*
@@ -251,7 +251,7 @@ function consumer(item) {
         setColorActionbar(item, 'zpaid')
       }
       else {
-        console.log('Damn! found a leak, things change, roll with the punches')
+        // console.log('normal || Damn! found a leak, things change, roll with the punches')
       }
     }
     else {
@@ -280,9 +280,17 @@ function consumeSearchContainer(item) {
   }
   else if (!isVoid(item.getAttribute('data-za-extra-module'))) {
     const magzineList = item.getElementsByClassName('KfeCollection-PcCollegeCard-wrapper') || []
+    const paidList = item.getElementsByClassName('KfeCollection-AnswerTopCard-Container') || []
     if (magzineList.length !== 0) {
       setColorMain(item, 'magzine')
       setColorActionbar(item, 'magzine')
+    }
+    else if (paidList.length !== 0) {
+      const parent = paidList[0].parentElement
+      if (parent.classList.contains('RichContent')) {
+        setColorMain(parent, 'zpaid')
+        setColorActionbar(parent, 'zpaid')
+      }
     }
     else {
       const data = item.getAttribute('data-za-extra-module')
