@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         zhihuColorRenderPro
 // @namespace    http://io.github.fadeoc/
-// @version      0.11.1
+// @version      0.12
 // @description  really? pro?
 // @author       unwilling to leave name Mr. Fadeoc
 // @match        http*://www.zhihu.com/*
@@ -231,6 +231,10 @@ function consumer(item) {
     if (c && c.href.includes('roundtable')) {
       setColorMain(item, 'roundTable')
       setColorActionbar(item, 'roundTable')
+    }
+    if (c && c.href.includes('/p/')) {
+      setColorMain(item, 'article')
+      setColorActionbar(item, 'article')
     }
   }
 
