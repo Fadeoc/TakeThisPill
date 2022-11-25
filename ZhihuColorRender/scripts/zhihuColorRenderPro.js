@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         zhihuColorRenderPro
 // @namespace    http://io.github.fadeoc/
-// @version      0.12
+// @version      0.13
 // @description  really? pro?
 // @author       unwilling to leave name Mr. Fadeoc
 // @match        http*://www.zhihu.com/*
