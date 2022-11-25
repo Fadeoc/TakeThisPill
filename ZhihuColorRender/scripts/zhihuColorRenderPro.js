@@ -236,6 +236,10 @@ function consumer(item) {
       setColorMain(item, 'article')
       setColorActionbar(item, 'article')
     }
+    if (c && c.href.includes('/market/')) {
+      setColorMain(item, 'ads')
+      setColorActionbar(item, 'ads')
+    }
   }
 
   const feed = item.getElementsByClassName('Feed')
