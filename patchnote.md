@@ -1,5 +1,17 @@
 pro mode
 ========================
+zhihuColorRenderPro 0.13
+---------------------
+1. feature: hot list will add color to ads
+========================
+zhihuColorRenderPro 0.12
+---------------------
+1. feature: hot list will add color to article recommends
+========================
+zhihuColorRenderPro 0.11
+---------------------
+1. feature: VIP Content will be Colored in Search Page once expanded
+========================
 zhihuColorRenderPro 0.10
 ---------------------
 1. feature: hot list will blue roundtable items
