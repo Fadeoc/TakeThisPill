@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         zhihuColorRenderPro
 // @namespace    http://io.github.fadeoc/
-// @version      0.13
+// @version      0.13B
 // @description  really? pro?
 // @author       unwilling to leave name Mr. Fadeoc
 // @match        http*://www.zhihu.com/*
@@ -40,7 +40,8 @@ let unsafeWindow = {};
     btnSaleLinkFolderBg: '#5e83bf',
     btnSaleLinkFolderBgHover: '#89b2f5',
     btnSaleLinkFolderText: '#f8f8f8',
-
+    actionBarReArrangeBorderColor: '#9aaf73',
+    actionBarReArrangeBgColor: '#89b2f5',
   }
   //accessbility
   unsafeWindow.descMap = {
@@ -224,6 +225,8 @@ function consumer(item) {
 
   if (unsafeWindow.proMap.imageRender) {
     imageReArrangeFactory(item)
+    // actionBarReArrangeFactory(item)
+    // retractReArrangeFactory(item)
   }
 
   if (item.classList.contains('HotItem')) {
@@ -459,11 +462,17 @@ function setColorActionbar(item, type) {
     console.log('Damn! found a leak, things change, roll with the punches')
     return
   }
+  type = (type === 'default' && unsafeWindow.proMap.actionBarReArrangeBgColor !== '') ? 'actionBarReArrangeBgColor' : type
   item.style.backgroundColor = unsafeWindow.colorMap[type]
   if (unsafeWindow.colorMap[type] === 'hide') {
     item.style.display = "none";
   }
+  // if type is default and actionBarReArrangeBorderColor is not default, set actionbar color to actionBarReArrangeBorderColor
   actionBar[0].style.backgroundColor = unsafeWindow.colorMap[type]
+  // if borderType is not empty, set border color with 1px solid
+  if (type === 'actionBarReArrangeBgColor' && unsafeWindow.colorMap['actionBarReArrangeBorderColor'] !== '') {
+    actionBar[0].style.border = '1px solid ' + unsafeWindow.colorMap['actionBarReArrangeBorderColor']
+  }
   const innerActionBars = actionBar[0].getElementsByClassName('ContentItem-action')
   if (innerActionBars.length > 0) {
     Array.prototype.forEach.call(innerActionBars, innerActionBar => {
@@ -542,6 +551,23 @@ function imageReArrangeFactory(item) {
 
 }
 
+function retractReArrangeFactory(item) {
+  const retracts = item.querySelectorAll('[data-zop-retract-question="true"]')?.[0];
+  if (isVoid(retracts)) {
+    return
+  }
+  console.log('retracts: ', retracts)
+  Array.prototype.forEach.call(retracts, btn => reArrangeCollapseBtn(btn))
+}
+
+function actionBarReArrangeFactory (item) {
+  const actionBars = item.getElementsByClassName('ContentItem-actions')
+  if (isVoid(actionBars)) {
+    return
+  }
+  Array.prototype.forEach.call(actionBars, actionBar => reArrangeActionBar(actionBar))
+}
+
 /**
  * @method foldElement
  * @description fold HTML element. The function simply fold the element without do any thing but add a restore/fold btn
@@ -611,10 +637,11 @@ function foldElement(_element, btnTextColor, btnBgColor, btnBgHoverColor) {
 function reArrange(img) {
 
   let parentNode = img.parentElement
+  let grandParentNode = parentNode.parentElement
 
   const isGif = parentNode.classList.contains('GifPlayer')
 
-  if (parentNode.tagName.toLowerCase() !== 'figure' && !isGif) {
+  if (parentNode.tagName.toLowerCase() !== 'figure' && grandParentNode.tagName.toLowerCase() !== 'figure' && !isGif ) {
     return
   }
 
@@ -665,6 +692,51 @@ function reArrange(img) {
   // parentNode.insertBefore(restoreBtn, img)
   parentNode.prepend(restoreBtn)
 
+}
+
+function reArrangeActionBar (actionBar) {
+  // find parent node,
+  const parentNode = actionBar.parentElement
+  if (isVoid(parentNode)) {
+    return
+  }
+  // if parent node has child with class ContentItem-expandButton, and first child is not it, remove it, and prepend, then return
+  const expandBtn = parentNode.querySelector('.ContentItem-expandButton')
+  if (!isVoid(expandBtn)) {
+    if (expandBtn === parentNode.firstChild) {
+      return
+    }
+    // set parent node height to 100px
+    // parentNode.style.height = '100px'
+    expandBtn.remove()
+    parentNode.prepend(expandBtn)
+    // find span next to it, set style position to relative, top to 50px
+    // const span = expandBtn.nextElementSibling
+    // if (!isVoid(span)) {
+    //   span.style.position = 'relative'
+    //   span.style.top = '30px'
+    // }
+    return
+  }
+  // remove parent node height style
+  // parentNode.style.height = ''
+  // if span child has position relative, remove style position and top
+  // const span = actionBar.querySelector('span')
+  // if (!isVoid(span)) {
+  //   span.style.position = ''
+  //   span.style.top = ''
+  // }
+  //  if actionBar is first child already, return
+  if (parentNode.firstChild === actionBar) {
+    return
+  }
+  // remove the original action bar from parent node, and prepend to the parent node
+  parentNode.removeChild(actionBar)
+  parentNode.prepend(actionBar)
+}
+
+function reArrangeCollapseBtn (btn) {
+  btn.click()
 }
 
 
