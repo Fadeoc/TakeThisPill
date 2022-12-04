@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         zhihuColorRenderPro
 // @namespace    http://io.github.fadeoc/
-// @version      0.13B
+// @version      0.13B2
 // @description  really? pro?
 // @author       unwilling to leave name Mr. Fadeoc
 // @match        http*://www.zhihu.com/*
@@ -23,7 +23,7 @@ let unsafeWindow = {};
     answer: '',
     ads: 'grey',
     article: '#e8c15f',
-    magzine: '#e8c15f',
+    magazine: '#e8c15f',
     zpaid: '#ff730e',
     roundTable: 'skyblue',
     post: '#e8c15f',
@@ -49,7 +49,7 @@ let unsafeWindow = {};
     answer: '这是一个回答',
     ads: '这是一支广告',
     article: '这是一篇文章',
-    magzine: '这是一篇电子杂志',
+    magazine: '这是一篇电子杂志',
     post: '这是一篇发布',
     zvideo: '这是一部视频',
     relevant: '这是您搜索结果的相关内容推荐链接区域'
@@ -287,14 +287,31 @@ function consumer(item) {
 function consumeSearchContainer(item) {
   const relevantBlocks = item.getElementsByClassName('RelevantQuery')
   if (!isVoid(relevantBlocks)) {
-    setColorMain(item, 'relavent')
+    setColorMain(item, 'relevant')
   }
-  else if (!isVoid(item.getAttribute('data-za-extra-module'))) {
-    const magzineList = item.getElementsByClassName('KfeCollection-PcCollegeCard-wrapper') || []
+  else if (!isVoid(item.getAttribute('data-za-extra-module')) || !isVoid(item.firstChild.getAttribute('data-za-extra-module'))) {
+    const magazineList = item.firstChild.getAttribute('data-za-detail-view-path-is_ad') || []
     const paidList = item.getElementsByClassName('KfeCollection-AnswerTopCard-Container') || []
-    if (magzineList.length !== 0) {
-      setColorMain(item, 'magzine')
-      setColorActionbar(item, 'magzine')
+    const isRecommend = Array.prototype.some.call(item.getElementsByTagName('b'), (b) => b.textContent === '盐选推荐')
+    if (magazineList.length !== 0) {
+      setColorMain(item, 'magazine')
+      setColorActionbar(item, 'magazine')
+      setColorMain(item.firstChild, 'magazine')
+      setColorActionbar(item.firstChild, 'magazine')
+      const w = item.getElementsByClassName('KfeCollection-PcCollegeCard-wrapper')
+      if (!isVoid(w)) {
+        setColorMain(w[0], 'magazine')
+        setColorActionbar(w[0], 'magazine')
+      }
+      const w2 = w[0].getElementsByClassName('KfeCollection-PcCollegeCard-root')
+      if (!isVoid(w2)) {
+        setColorMain(w2[0], 'magazine')
+        setColorActionbar(w2[0], 'magazine')
+      }
+    }
+    else if (isRecommend) {
+      setColorMain(item, 'zpaid')
+      setColorActionbar(item, 'zpaid')
     }
     else if (paidList.length !== 0) {
       const parent = paidList[0].parentElement
